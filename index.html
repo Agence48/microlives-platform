@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyxx</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Minimaliste */
+        .sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid #F0F0F0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 38px;
+            font-weight: 900;
+            color: #1A1A1A;
+            margin-bottom: 40px;
+            letter-spacing: -1px;
+        }
+
+        .menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: #1A1A1A;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: #F8F8F8;
+        }
+
+        .menu-item.active {
+            background: #F0F0F0;
+            font-weight: 500;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .menu-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .menu-text {
+            font-size: 16px;
+        }
+
+        .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #FF4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Video Feed Container */
+        .video-feed {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+
+        .video-feed::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Video Item */
+        .video-item {
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: #000;
+        }
+
+        .video-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 450px;
+            background: #000;
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Blur pour contenu premium */
+        .video-item.locked .video-thumbnail {
+            filter: blur(30px);
+        }
+
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .lock-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .lock-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .lock-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .subscribe-btn {
+            background: white;
+            color: #1A1A1A;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .subscribe-btn:hover {
+            background: #F0F0F0;
+        }
+
+        /* Video Info Overlay */
+        .video-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        }
+
+        .creator-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .creator-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #1A1A1A;
+        }
+
+        .creator-name {
+            color: white;
+            font-weight: 500;
+        }
+
+        .video-title {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .video-description {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        /* Action Buttons */
+        .video-actions {
+            position: absolute;
+            right: 20px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .action-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .action-btn.liked {
+            color: #FF4444;
+        }
+
+        .action-icon {
+            font-size: 24px;
+        }
+
+        .action-count {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .video-content {
+                max-width: 100%;
+            }
+
+            .mobile-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                border-top: 1px solid #F0F0F0;
+                display: flex;
+                justify-content: space-around;
+                padding: 8px 0;
+                z-index: 1000;
+            }
+
+            .mobile-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+                padding: 8px;
+                color: #666;
+                font-size: 10px;
+            }
+
+            .mobile-nav-item.active {
+                color: #1A1A1A;
+                font-weight: 500;
+            }
+
+            .mobile-nav-icon svg {
+                width: 22px;
+                height: 22px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-nav {
+                display: none;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">NYXX</div>
+            <ul class="menu">
+                <li>
+                    <a href="#" class="menu-item active" onclick="setActive(this)">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Pour toi</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" onclick="setActive(this)">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Explorer</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" onclick="setActive(this)">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.65 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm8 0c-.33 0-.67.03-1 .08 1.2.89 2 2.25 2 3.92v2h6v-2c0-2.66-5.33-4-7-4z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Suivis</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" onclick="setActive(this)">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M15 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4m-7-4l-2-2v3H3v2h3v3l2-2 2 2v-3h3v-2H10v-3l-2 2m7-2c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/>
+                            </svg>
+                            <span class="badge">2</span>
+                        </span>
+                        <span class="menu-text">Amis</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" onclick="setActive(this)">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                            </svg>
+                            <span class="badge">3</span>
+                        </span>
+                        <span class="menu-text">Notifications</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" onclick="setActive(this)">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Profil</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="video-feed" id="videoFeed">
+                <!-- Les vidéos seront ajoutées ici -->
+            </div>
+        </main>
+
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav">
+            <a class="mobile-nav-item active" onclick="setMobileActive(this)">
+                <span class="mobile-nav-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                </span>
+                <span>Pour toi</span>
+            </a>
+            <a class="mobile-nav-item" onclick="setMobileActive(this)">
+                <span class="mobile-nav-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </span>
+                <span>Explorer</span>
+            </a>
+            <a class="mobile-nav-item" onclick="setMobileActive(this)">
+                <span class="mobile-nav-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    </svg>
+                </span>
+                <span>Notifs</span>
+            </a>
+            <a class="mobile-nav-item" onclick="setMobileActive(this)">
+                <span class="mobile-nav-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </span>
+                <span>Profil</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Subscribe Modal -->
+    <div id="subscribeModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <h2 class="modal-title">S'abonner à <span id="creatorName"></span></h2>
+            <p>Abonnez-vous pour accéder à tous les replays premium de cette créatrice.</p>
+            <br>
+            <button class="subscribe-btn" style="width: 100%;" onclick="subscribe()">
+                S'abonner - 9,99€/mois
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const videos = [
+            {
+                id: 1,
+                creator: "Luna",
+                title: "Session VIP Exclusive",
+                description: "Un moment intime juste pour mes fans 💜",
+                thumbnail: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect fill='%23667eea' width='400' height='800'/%3E%3C/svg%3E",
+                likes: 1234,
+                comments: 89,
+                isPremium: true,
+                isSubscribed: false
+            },
+            {
+                id: 2,
+                creator: "Maya",
+                title: "Morning Vibes ☀️",
+                description: "Commençons la journée ensemble",
+                thumbnail: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect fill='%2364b5f6' width='400' height='800'/%3E%3C/svg%3E",
+                likes: 856,
+                comments: 45,
+                isPremium: false,
+                isSubscribed: true
+            },
+            {
+                id: 3,
+                creator: "Sophie",
+                title: "Q&A Privé",
+                description: "Je réponds à toutes vos questions 🔥",
+                thumbnail: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect fill='%23f06292' width='400' height='800'/%3E%3C/svg%3E",
+                likes: 2341,
+                comments: 234,
+                isPremium: true,
+                isSubscribed: true
+            }
+        ];
+
+        // Initialize
+        function init() {
+            const feed = document.getElementById('videoFeed');
+            feed.innerHTML = '';
+            
+            videos.forEach(video => {
+                const isLocked = video.isPremium && !video.isSubscribed;
+                const videoEl = document.createElement('div');
+                videoEl.className = `video-item ${isLocked ? 'locked' : ''}`;
+                
+                videoEl.innerHTML = `
+                    <div class="video-content">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="video-thumbnail">
+                        
+                        ${isLocked ? `
+                            <div class="lock-overlay">
+                                <div class="lock-icon">🔒</div>
+                                <div class="lock-title">Contenu Premium</div>
+                                <div class="lock-subtitle">Abonnez-vous pour débloquer</div>
+                                <button class="subscribe-btn" onclick="openModal('${video.creator}')">
+                                    S'abonner à ${video.creator}
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="video-overlay">
+                            <div class="creator-info">
+                                <div class="creator-avatar">${video.creator[0]}</div>
+                                <div class="creator-name">@${video.creator.toLowerCase()}</div>
+                            </div>
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-description">${video.description}</div>
+                        </div>
+                        
+                        <div class="video-actions">
+                            <button class="action-btn" onclick="toggleLike(this)">
+                                <span class="action-icon">❤️</span>
+                                <span class="action-count">${formatCount(video.likes)}</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">💬</span>
+                                <span class="action-count">${formatCount(video.comments)}</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">🔖</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">↗️</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                feed.appendChild(videoEl);
+            });
+        }
+
+        function formatCount(num) {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function setActive(element) {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        function setMobileActive(element) {
+            document.querySelectorAll('.mobile-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        function toggleLike(btn) {
+            btn.classList.toggle('liked');
+        }
+
+        function openModal(creator) {
+            document.getElementById('creatorName').textContent = creator;
+            document.getElementById('subscribeModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('subscribeModal').classList.remove('active');
+        }
+
+        function subscribe() {
+            alert('Abonnement simulé !');
+            closeModal();
+            init(); // Recharger
+        }
+
+        // Start
+        init();
+
+        // Smooth scroll for desktop
+        const videoFeed = document.getElementById('videoFeed');
+        if (window.innerWidth > 768) {
+            videoFeed.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = Math.sign(e.deltaY);
+                const scrollAmount = window.innerHeight;
+                videoFeed.scrollBy({
+                    top: scrollAmount * delta,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    </script>
+</body>
+</html>
