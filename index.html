@@ -4,7 +4,421 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nyxx - Live Streaming Platform</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ========================================
+           NYXX - THÈME 100% CLAIR
+           ======================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-primary: #1A1A1A;
+            --color-secondary: #666666;
+            --color-accent: #FF4444;
+            --bg-main: #FAFAFA;
+            --bg-white: #FFFFFF;
+            --bg-hover: #F8F8F8;
+            --bg-active: #F0F0F0;
+            --border-light: #F0F0F0;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            background: var(--bg-main);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 38px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 40px;
+            letter-spacing: -1px;
+        }
+
+        .menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .menu-item.active {
+            background: var(--bg-active);
+            font-weight: 500;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .menu-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .menu-text {
+            font-size: 16px;
+        }
+
+        .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--color-accent);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        /* MAIN CONTENT - FOND CLAIR */
+        .main-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: var(--bg-main);
+        }
+
+        .video-feed {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+            background: var(--bg-main);
+        }
+
+        .video-feed::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* VIDEO ITEMS - FOND BLANC */
+        .video-item {
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: var(--bg-white);
+        }
+
+        .video-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 450px;
+            background: var(--bg-white);
+            overflow: hidden;
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: var(--bg-hover);
+        }
+
+        .video-item.locked .video-thumbnail {
+            filter: blur(30px);
+            opacity: 0.8;
+        }
+
+        /* OVERLAY PREMIUM - FOND BLANC */
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .lock-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .lock-title {
+            color: var(--text-primary);
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .lock-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .subscribe-btn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .subscribe-btn:hover {
+            background: #333;
+        }
+
+        /* VIDEO INFO - FOND BLANC */
+        .video-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(255, 255, 255, 0.95));
+        }
+
+        .creator-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .creator-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+        }
+
+        .creator-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .video-title {
+            color: var(--text-primary);
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .video-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ACTION BUTTONS - FOND BLANC */
+        .video-actions {
+            position: absolute;
+            right: 20px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .action-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-white);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-hover);
+            transform: scale(1.05);
+        }
+
+        .action-btn.liked {
+            color: var(--color-accent);
+            background: #FFF5F5;
+        }
+
+        .action-icon {
+            font-size: 24px;
+        }
+
+        .action-count {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        /* MOBILE */
+        .mobile-nav {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .video-content {
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            .mobile-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--bg-white);
+                border-top: 1px solid var(--border-light);
+                display: flex;
+                justify-content: space-around;
+                padding: 8px 0;
+                z-index: 1000;
+            }
+
+            .mobile-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+                padding: 8px;
+                color: var(--text-secondary);
+                font-size: 10px;
+            }
+
+            .mobile-nav-item.active {
+                color: var(--text-primary);
+                font-weight: 500;
+            }
+
+            .mobile-nav-icon svg {
+                width: 22px;
+                height: 22px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .video-content {
+                border: 1px solid var(--border-light);
+                border-radius: 12px;
+                box-shadow: var(--shadow-sm);
+            }
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -81,7 +495,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="video-feed" id="videoFeed">
-                <!-- Les vidéos seront ajoutées dynamiquement ici -->
+                <!-- Les vidéos seront ajoutées ici -->
             </div>
         </main>
 
@@ -123,29 +537,181 @@
         </nav>
     </div>
 
-    <!-- Subscribe Modal -->
+    <!-- Modal -->
     <div id="subscribeModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">×</button>
-            <h2 class="modal-title">S'abonner à <span id="creatorName"></span></h2>
-            <p class="modal-description">Abonnez-vous pour accéder à tous les replays premium de cette créatrice.</p>
-            <div class="price-options">
-                <div class="price-option selected" onclick="selectPrice(this, 9.99)">
-                    <div class="price-amount">9,99€</div>
-                    <div class="price-period">par mois</div>
-                </div>
-                <div class="price-option" onclick="selectPrice(this, 89.99)">
-                    <div class="price-amount">89,99€</div>
-                    <div class="price-period">par an (-25%)</div>
-                </div>
-            </div>
-            <button class="subscribe-btn-modal" onclick="subscribe()">
-                S'abonner
+            <h2>S'abonner à <span id="creatorName"></span></h2>
+            <p style="color: #666; margin: 20px 0;">Débloquez tous les contenus premium</p>
+            <button class="subscribe-btn" style="width: 100%;" onclick="subscribe()">
+                S'abonner - 9,99€/mois
             </button>
         </div>
     </div>
 
-    <!-- JavaScript -->
-    <script src="app.js"></script>
+    <script>
+        // Vidéos avec couleurs CLAIRES
+        const videos = [
+            {
+                id: 1,
+                creator: "Luna",
+                title: "Session VIP Exclusive",
+                description: "Un moment intime juste pour mes fans 💜",
+                thumbnail: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect fill='%23F0E6FF' width='400' height='800'/%3E%3C/svg%3E",
+                likes: 1234,
+                comments: 89,
+                isPremium: true,
+                isSubscribed: false
+            },
+            {
+                id: 2,
+                creator: "Maya",
+                title: "Morning Vibes ☀️",
+                description: "Commençons la journée ensemble",
+                thumbnail: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect fill='%23E6F3FF' width='400' height='800'/%3E%3C/svg%3E",
+                likes: 856,
+                comments: 45,
+                isPremium: false,
+                isSubscribed: true
+            },
+            {
+                id: 3,
+                creator: "Sophie",
+                title: "Q&A Privé",
+                description: "Je réponds à toutes vos questions 🔥",
+                thumbnail: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Crect fill='%23FFE6F0' width='400' height='800'/%3E%3C/svg%3E",
+                likes: 2341,
+                comments: 234,
+                isPremium: true,
+                isSubscribed: true
+            }
+        ];
+
+        let currentCreator = null;
+
+        // Initialize
+        function init() {
+            const feed = document.getElementById('videoFeed');
+            feed.innerHTML = '';
+            
+            videos.forEach(video => {
+                const isLocked = video.isPremium && !video.isSubscribed;
+                const videoEl = document.createElement('div');
+                videoEl.className = `video-item ${isLocked ? 'locked' : ''}`;
+                
+                videoEl.innerHTML = `
+                    <div class="video-content">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="video-thumbnail">
+                        
+                        ${isLocked ? `
+                            <div class="lock-overlay">
+                                <div class="lock-icon">🔒</div>
+                                <div class="lock-title">Contenu Premium</div>
+                                <div class="lock-subtitle">Abonnez-vous pour débloquer</div>
+                                <button class="subscribe-btn" onclick="openModal('${video.creator}')">
+                                    S'abonner à ${video.creator}
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="video-overlay">
+                            <div class="creator-info">
+                                <div class="creator-avatar">${video.creator[0]}</div>
+                                <div class="creator-name">@${video.creator.toLowerCase()}</div>
+                            </div>
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-description">${video.description}</div>
+                        </div>
+                        
+                        <div class="video-actions">
+                            <button class="action-btn" onclick="toggleLike(this, ${video.id})">
+                                <span class="action-icon">❤️</span>
+                                <span class="action-count">${formatCount(video.likes)}</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">💬</span>
+                                <span class="action-count">${formatCount(video.comments)}</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">🔖</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">↗️</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                feed.appendChild(videoEl);
+            });
+        }
+
+        function formatCount(num) {
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function setActive(element) {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        function setMobileActive(element) {
+            document.querySelectorAll('.mobile-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        function toggleLike(btn, videoId) {
+            btn.classList.toggle('liked');
+            const video = videos.find(v => v.id === videoId);
+            const count = btn.querySelector('.action-count');
+            if (btn.classList.contains('liked')) {
+                video.likes++;
+            } else {
+                video.likes--;
+            }
+            count.textContent = formatCount(video.likes);
+        }
+
+        function openModal(creator) {
+            currentCreator = creator;
+            document.getElementById('creatorName').textContent = creator;
+            document.getElementById('subscribeModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('subscribeModal').classList.remove('active');
+        }
+
+        function subscribe() {
+            videos.forEach(video => {
+                if (video.creator === currentCreator) {
+                    video.isSubscribed = true;
+                }
+            });
+            closeModal();
+            init();
+        }
+
+        // Start
+        init();
+
+        // Smooth scroll
+        const videoFeed = document.getElementById('videoFeed');
+        if (window.innerWidth > 768) {
+            videoFeed.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = Math.sign(e.deltaY);
+                videoFeed.scrollBy({
+                    top: window.innerHeight * delta,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    </script>
 </body>
 </html>
